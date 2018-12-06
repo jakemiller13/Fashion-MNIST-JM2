@@ -114,6 +114,32 @@ def fully_connected_layer(x_input, dimensions):
     W, b = create_weights_bias(dimensions)
     return tf.matmul(x_input, W) + b
 
+def apply_softmax(x_input):
+    '''
+    Applies softmax to x_input
+    '''
+    return tf.nn.softmax(x_input)
+    
+def loss_function(y_, y_input):
+    '''
+    Applies cross entropy loss function
+    '''
+    return tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_input),
+                                         reduction_indices=[1]))
+
+def optimizer(loss):
+    '''
+    Applies Adam optimizer to loss
+    '''
+    return tf.train.AdamOptimizer(1e-4).minimize(loss)
+
+def accuracy(y_, y_input):
+    '''
+    Returns average of correct predictions
+    '''
+    correct = tf.equal(tf.argmax(y_input, 1), tf.argmax(y_, 1))
+    return tf.reduce_mean(tf.cast(correct, tf.float32))
+
 ###########
 # Program #
 ###########
@@ -140,6 +166,8 @@ max_pool2 = apply_max_pool_layer(relu2,
 dropout2 = dropout(max_pool2, keep_prob = 0.5)
 flatten2 = flatten_layer(dropout2)
 fc3 = fully_connected_layer(flatten2,
-                            dimensions = [max_pool2.shape[1],
-                                          max_pool2.shape[2],
-                                          max_pool2.shape[3]])
+                            dimensions = [flatten2.shape[1].value,
+                                          10])
+softmax3 = apply_softmax(fc3)
+loss = loss_function(y_, softmax3)
+optimize = optimizer(loss)
