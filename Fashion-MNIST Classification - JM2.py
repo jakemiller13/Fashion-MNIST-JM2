@@ -131,7 +131,7 @@ def optimizer(loss):
     '''
     Applies Adam optimizer to loss
     '''
-    return tf.train.AdamOptimizer(1e-4).minimize(loss)
+    return tf.train.AdamOptimizer(0.0001).minimize(loss)
 
 def accuracy(y_, y_input):
     '''
@@ -143,8 +143,15 @@ def accuracy(y_, y_input):
 ###########
 # Program #
 ###########
-sess.close()
+try:
+    sess.close()
+except NameError:
+    pass
+
 sess = create_interactive_session()
+
+x_train, y_train, x_test, y_test = create_datasets()
+
 x, y_ = create_placeholders()
 x_tensor = convert_image_to_tensor(x)
 
@@ -171,3 +178,16 @@ fc3 = fully_connected_layer(flatten2,
 softmax3 = apply_softmax(fc3)
 loss = loss_function(y_, softmax3)
 optimize = optimizer(loss)
+
+epochs = 5
+
+for epoch in range(epochs):
+    print('Evaluating epoch: ' + str(epoch + 1))
+    train_accuracy = accuracy(y_, softmax3).eval(feed_dict =
+                                                {x : x_train,
+                                                 y_ : y_train})
+#                                                 keep_prob : 1.0})
+    print(train_accuracy)
+    optimizer(loss).run(feed_dict = {x : x_train,
+                                     y_ : y_train})
+#                                     keep_prob : 0.5})
