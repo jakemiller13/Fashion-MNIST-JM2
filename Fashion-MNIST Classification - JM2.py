@@ -144,7 +144,7 @@ def accuracy(y_, y_input):
 # Program #
 ###########
 try:
-    sess.close()
+    InteractiveSession.close()
 except NameError:
     pass
 
@@ -153,7 +153,8 @@ sess = create_interactive_session()
 x_train, y_train, x_test, y_test = create_datasets()
 
 x, y_ = create_placeholders()
-x_tensor = convert_image_to_tensor(x)
+#x_tensor = convert_image_to_tensor(x)
+x_tensor = convert_image_to_tensor(x_train)
 
 conv1 = apply_conv_layer(x_tensor,
                          kernel = [5, 5, 1, 32],
